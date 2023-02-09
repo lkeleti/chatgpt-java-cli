@@ -25,7 +25,6 @@ public class Service {
         ChatGptRequest chatGptRequest = new ChatGptRequest(searchString);
         String input = mapper.writeValueAsString(chatGptRequest);
 
-
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.openai.com/v1/completions"))
                 .header("Content-Type", "application/json")
@@ -35,10 +34,11 @@ public class Service {
         HttpClient httpClient = HttpClient.newHttpClient();
         var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
-        showAnswer(mapper, response);
+        showAnswer(response);
     }
 
-    private static void showAnswer(ObjectMapper mapper, HttpResponse<String> response) throws JsonProcessingException {
+    private static void showAnswer(HttpResponse<String> response) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
         if (response.statusCode() == 200) {
             ChatGptResponse chatGptResponse = mapper.readValue(response.body(), ChatGptResponse.class);
             String answer = chatGptResponse.getChoices()[chatGptResponse.getChoices().length-1].getText();
