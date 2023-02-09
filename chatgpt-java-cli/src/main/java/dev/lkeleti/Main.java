@@ -11,38 +11,14 @@ import java.util.Scanner;
 
 public class Main {
 
-
-
     public static void main(String[] args) throws IOException, InterruptedException {
-        Scanner scanner = new Scanner(System.in);
+        Service service = new Service();
+        String searchString = "";
         System.out.println("Enter a string for search: ");
-        String searchString = scanner.nextLine();
 
-        ObjectMapper mapper = new ObjectMapper();
-        ChatGptRequest chatGptRequest = new ChatGptRequest(searchString);
-        String input = mapper.writeValueAsString(chatGptRequest);
-
-
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.openai.com/v1/completions"))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .POST(HttpRequest.BodyPublishers.ofString(input))
-                .build();
-        HttpClient httpClient = HttpClient.newHttpClient();
-        var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            ChatGptResponse chatGptResponse = mapper.readValue(response.body(), ChatGptResponse.class);
-            String answer = chatGptResponse.getChoices()[chatGptResponse.getChoices().length-1].getText();
-            if (!answer.isBlank()) {
-                System.out.println(answer.replace("\n","").trim());
-            }
+        while (searchString.toUpperCase() != "QUIT" ) {
+            searchString = service.getSearchString();
+            service.getAiAnswer(searchString);
         }
-        else {
-            System.out.println(response.statusCode());
-            System.out.println(response.body());
-        }
-
     }
 }
